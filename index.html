@@ -142,11 +142,8 @@ This little website is just for you.
 I hope your birthday is full of happiness, smiles and beautiful moments.
 </p>
 
-<div class="gallery">
-  <img class="photo" src="images/photo1.jpg">
-  <img class="photo" src="images/photo2.jpg">
-  <img class="photo" src="images/photo3.jpg">
-</div>
+<!-- Empty gallery; JS will fill it automatically -->
+<div class="gallery" id="gallery"></div>
 
 <button onclick="celebrate()">Celebrate 🎆</button>
 
@@ -239,6 +236,18 @@ requestAnimationFrame(animate)
 animate()
 
 }
+
+// -------- Automatic Gallery for JPEG images --------
+const imageList = ["photo1.jpeg","photo2.jpeg","photo3.jpeg"]; // correct extensions
+const basePath = "/Birthday-Wish/images/"; // include your repo folder for GitHub Pages
+const gallery = document.getElementById("gallery");
+
+imageList.forEach(img => {
+    const imageElement = document.createElement("img");
+    imageElement.src = basePath + img;
+    imageElement.className = "photo";
+    gallery.appendChild(imageElement);
+});
 
 </script>
 
