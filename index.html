@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-
 body{
   font-family:'Quicksand',sans-serif;
   margin:0;
@@ -107,14 +106,12 @@ button{
 canvas{
   position:fixed;
   bottom:0;
-  left:50%;
-  transform:translateX(-50%);
+  left:0;
   pointer-events:none;
   width:100%;
-  height:50%;
+  height:100%;
   z-index:9999;
 }
-
 </style>
 </head>
 
@@ -141,13 +138,8 @@ canvas{
 </section>
 
 <section id="page3" class="hidden">
-
 <h1>You are very special Jamaima ✨</h1>
-
-<p>
-This little website is just for you.  
-I hope your birthday is full of happiness, smiles and beautiful moments.
-</p>
+<p>This little website is just for you. I hope your birthday is full of happiness, smiles and beautiful moments.</p>
 
 <div class="gallery">
   <img class="photo" src="images/photo1.jpeg" alt="Jamaima">
@@ -155,13 +147,11 @@ I hope your birthday is full of happiness, smiles and beautiful moments.
   <img class="photo" src="images/photo3.jpeg" alt="Jamaima">
 </div>
 
-<button onclick="celebrate()">Celebrate 🎆</button>
+<button onclick="startCelebration()">Celebrate 🎆</button>
 
 <p style="margin-top:20px;font-size:22px">
-Happy Birthday in Advance 🎂  
-<br>– From Sheikhu
+Happy Birthday in Advance 🎂<br>– From Sheikhu
 </p>
-
 </section>
 
 <canvas id="fire"></canvas>
@@ -180,10 +170,8 @@ function openPage3(){
 
 function openCard(){
   document.getElementById("music").play()
-
   let text="Happy Birthday in Advance Jamaima! 🎂 May your life be full of happiness, smiles and success."
   let i=0
-
   let typing=setInterval(function(){
     document.getElementById("message").innerHTML+=text.charAt(i)
     i++
@@ -201,52 +189,79 @@ function createBalloons(){
   },800)
 }
 
-// Simple upward fireworks effect
-function celebrate(){
-  let canvas = document.getElementById("fire");
-  let ctx = canvas.getContext("2d");
+// Extraordinary fireworks effect
+function startCelebration(){
+  const canvas = document.getElementById("fire");
+  const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let particles = [];
+  const fireworks = [];
+  const particles = [];
   const colors = ["#ff0040","#ff8000","#ffff00","#40ff00","#00ffff","#0040ff","#8000ff","#ff00ff"];
 
-  // Create particles at bottom center
-  for(let i=0; i<150; i++){
-    particles.push({
-      x: canvas.width/2,
-      y: canvas.height,
-      vx: (Math.random()-0.5)*4,
-      vy: -Math.random()*8 - 2, // upward
-      alpha:1,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      radius: Math.random()*3 + 2
-    });
+  // Firework object
+  class Firework {
+    constructor(){
+      this.x = Math.random()*canvas.width;
+      this.y = canvas.height;
+      this.targetY = Math.random() * canvas.height/2 + 50;
+      this.color = colors[Math.floor(Math.random()*colors.length)];
+      this.done = false;
+    }
+    update(){
+      this.y -= 6;
+      if(this.y <= this.targetY && !this.done){
+        this.explode();
+        this.done = true;
+      }
+    }
+    explode(){
+      for(let i=0;i<50;i++){
+        let angle = Math.random()*2*Math.PI;
+        let speed = Math.random()*4 + 2;
+        particles.push({
+          x: this.x,
+          y: this.y,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          alpha:1,
+          color: this.color,
+          radius: Math.random()*2+1
+        });
+      }
+    }
   }
 
   function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "rgba(0,0,0,0.1)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    particles.forEach((p)=>{
+    if(Math.random()<0.05){
+      fireworks.push(new Firework());
+    }
+
+    fireworks.forEach((f,i)=>{
+      f.update();
+      if(f.done) fireworks.splice(i,1);
+    });
+
+    particles.forEach((p,i)=>{
       p.x += p.vx;
       p.y += p.vy;
       p.alpha -= 0.02;
-
       if(p.alpha>0){
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
         ctx.beginPath();
-        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.arc(p.x,p.y,p.radius,0,2*Math.PI);
         ctx.fill();
+      } else {
+        particles.splice(i,1);
       }
     });
 
-    // remove faded particles
-    particles = particles.filter(p=>p.alpha>0);
-
-    if(particles.length>0){
-      requestAnimationFrame(animate);
-    }
+    requestAnimationFrame(animate);
   }
 
   animate();
